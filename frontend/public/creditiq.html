@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreditIQ — AI Credit Scoring System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0A2540;
+  --primary-mid: #1a3a5c;
+  --accent: #0070F3;
+  --accent-light: #EBF4FF;
+  --accent-glow: rgba(0,112,243,0.15);
+  --success: #00C48C;
+  --success-light: #E6FAF5;
+  --warning: #FFB020;
+  --warning-light: #FFF8E6;
+  --danger: #FF4D4D;
+  --danger-light: #FFF0F0;
+  --surface: #FFFFFF;
+  --surface-2: #F7F9FC;
+  --surface-3: #EEF2F7;
+  --border: #E2E8F0;
+  --text-primary: #0A2540;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(10,37,64,0.06);
+  --shadow-md: 0 4px 16px rgba(10,37,64,0.08);
+  --shadow-lg: 0 20px 40px rgba(10,37,64,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--surface-2); color:var(--text-primary); min-height:100vh; }
+
+/* ── SCREENS ── */
+.screen { display:none; min-height:100vh; }
+.screen.active { display:block; }
+
+/* ── LANDING PAGE ── */
+#landing {
+  background: linear-gradient(135deg, #0A2540 0%, #1a3a5c 50%, #0A2540 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  position:relative; overflow:hidden; min-height:100vh;
+}
+#landing::before {
+  content:''; position:absolute; top:-200px; right:-200px;
+  width:500px; height:500px;
+  background:radial-gradient(circle, rgba(0,112,243,0.2) 0%, transparent 70%);
+}
+#landing::after {
+  content:''; position:absolute; bottom:-200px; left:-200px;
+  width:400px; height:400px;
+  background:radial-gradient(circle, rgba(0,196,140,0.15) 0%, transparent 70%);
+}
+.landing-content { text-align:center; z-index:1; padding:40px 20px; max-width:600px; }
+.landing-logo { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:32px; }
+.landing-logo-icon {
+  width:56px; height:56px; background:linear-gradient(135deg,#0070F3,#00C48C);
+  border-radius:16px; display:flex; align-items:center; justify-content:center;
+  font-size:28px; box-shadow:0 8px 24px rgba(0,112,243,0.4);
+}
+.landing-logo-text { font-family:'DM Serif Display',serif; font-size:36px; color:#fff; }
+.landing-logo-text span { color:#60A5FA; }
+.landing-tagline { font-size:16px; color:rgba(255,255,255,0.6); margin-bottom:12px; letter-spacing:0.5px; }
+.landing-title { font-family:'DM Serif Display',serif; font-size:48px; color:#fff; line-height:1.2; margin-bottom:16px; letter-spacing:-1px; }
+.landing-title em { color:#60A5FA; font-style:italic; }
+.landing-sub { font-size:16px; color:rgba(255,255,255,0.55); margin-bottom:48px; line-height:1.7; }
+.landing-cards { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:500px; }
+.portal-card {
+  background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--radius-lg); padding:28px 24px; cursor:pointer;
+  transition:all 0.3s ease; backdrop-filter:blur(10px); text-align:left;
+}
+.portal-card:hover { background:rgba(255,255,255,0.12); transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+.portal-card-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:12px; }
+.portal-card-title { font-size:17px; font-weight:700; color:#fff; margin-bottom:4px; }
+.portal-card-sub { font-size:12px; color:rgba(255,255,255,0.45); line-height:1.5; }
+.portal-card-arrow { margin-top:16px; color:#60A5FA; font-size:20px; }
+.landing-features { display:flex; gap:24px; margin-top:40px; flex-wrap:wrap; justify-content:center; }
+.feature-pill {
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  padding:8px 16px; border-radius:20px; color:rgba(255,255,255,0.7); font-size:13px;
+}
+
+/* ── LOGIN PAGE ── */
+.login-page {
+  min-height:100vh; display:flex;
+}
+.login-left {
+  width:45%; background:linear-gradient(135deg, var(--primary), var(--primary-mid));
+  display:flex; flex-direction:column; justify-content:center; padding:60px;
+  position:relative; overflow:hidden; min-height:100vh;
+}
+.login-left::before {
+  content:''; position:absolute; top:-100px; right:-100px;
+  width:300px; height:300px;
+  background:radial-gradient(circle,rgba(0,112,243,0.25) 0%,transparent 70%);
+}
+.login-right {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:40px; background:var(--surface-2);
+}
+.login-brand { margin-bottom:40px; }
+.login-brand-logo { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.login-brand-icon { width:44px; height:44px; background:linear-gradient(135deg,#0070F3,#00C48C); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+.login-brand-name { font-family:'DM Serif Display',serif; font-size:28px; color:#fff; }
+.login-brand-name span { color:#60A5FA; }
+.login-brand-desc { font-size:14px; color:rgba(255,255,255,0.5); line-height:1.7; max-width:280px; }
+.login-stats { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:40px; }
+.login-stat { background:rgba(255,255,255,0.07); border-radius:var(--radius-md); padding:16px; }
+.login-stat-value { font-family:'DM Serif Display',serif; font-size:24px; color:#fff; }
+.login-stat-label { font-size:11px; color:rgba(255,255,255,0.4); margin-top:2px; }
+.login-box { background:var(--surface); border-radius:var(--radius-lg); padding:40px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); border:1px solid var(--border); }
+.login-box-title { font-family:'DM Serif Display',serif; font-size:26px; color:var(--text-primary); margin-bottom:6px; }
+.login-box-sub { font-size:13px; color:var(--text-muted); margin-bottom:28px; }
+.login-role-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; margin-bottom:20px; }
+.login-role-badge.admin { background:var(--accent-light); color:var(--accent); }
+.login-role-badge.applicant { background:var(--success-light); color:var(--success); }
+.form-group { margin-bottom:16px; }
+.form-label { display:block; font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.form-input { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text-primary); outline:none; transition:all 0.2s; background:var(--surface); }
+.form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+.login-btn { width:100%; padding:13px; border:none; border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:4px; }
+.login-btn.admin { background:linear-gradient(135deg,#0070F3,#0056D2); color:#fff; box-shadow:0 4px 14px rgba(0,112,243,0.3); }
+.login-btn.applicant { background:linear-gradient(135deg,#00C48C,#00A878); color:#fff; box-shadow:0 4px 14px rgba(0,196,140,0.3); }
+.login-btn:hover { transform:translateY(-1px); }
+.login-back { margin-top:16px; text-align:center; font-size:13px; color:var(--text-muted); cursor:pointer; }
+.login-back span { color:var(--accent); font-weight:600; }
+.demo-hint { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:20px; font-size:12px; color:var(--text-secondary); }
+.demo-hint strong { color:var(--text-primary); }
+
+/* ── SHARED LAYOUT ── */
+.app-layout { display:flex; min-height:100vh; }
+.sidebar { width:250px; background:var(--primary); position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; overflow:hidden; }
+.sidebar::before { content:''; position:absolute; top:-60px; right:-60px; width:180px; height:180px; background:radial-gradient(circle,rgba(0,112,243,0.25) 0%,transparent 70%); pointer-events:none; }
+.sidebar-logo { padding:24px 20px; border-bottom:1px solid rgba(255,255,255,0.08); }
+.logo-row { display:flex; align-items:center; gap:10px; }
+.logo-icon { width:36px; height:36px; background:linear-gradient(135deg,#0070F3,#00C48C); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.logo-name { font-family:'DM Serif Display',serif; font-size:20px; color:#fff; }
+.logo-name span { color:#60A5FA; }
+.logo-sub { font-size:10px; color:rgba(255,255,255,0.35); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; padding-left:46px; }
+.nav-section { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1.5px; text-transform:uppercase; padding:0 12px; margin:14px 0 6px; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; cursor:pointer; color:rgba(255,255,255,0.5); font-size:13px; font-weight:500; margin:1px 0; transition:all 0.15s; position:relative; border-left:3px solid transparent; }
+.nav-item:hover { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.9); }
+.nav-item.active { background:rgba(0,112,243,0.2); color:#fff; border-left-color:#0070F3; }
+.nav-icon { font-size:15px; width:20px; text-align:center; }
+.nav-badge { margin-left:auto; background:var(--accent); color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; }
+.sidebar-footer { padding:14px 12px 20px; border-top:1px solid rgba(255,255,255,0.08); margin-top:auto; }
+.user-pill { display:flex; align-items:center; gap:9px; padding:9px 10px; background:rgba(255,255,255,0.06); border-radius:8px; }
+.user-ava { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.user-ava.admin { background:linear-gradient(135deg,#0070F3,#0056D2); }
+.user-ava.applicant { background:linear-gradient(135deg,#00C48C,#00A878); }
+.user-name { font-size:12px; font-weight:600; color:#fff; }
+.user-role { font-size:10px; color:rgba(255,255,255,0.35); }
+.logout-btn { margin-top:8px; width:100%; padding:7px; background:rgba(255,77,77,0.1); border:1px solid rgba(255,77,77,0.2); border-radius:8px; color:rgba(255,100,100,0.8); font-size:12px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+.logout-btn:hover { background:rgba(255,77,77,0.2); }
+
+.main-area { margin-left:250px; flex:1; display:flex; flex-direction:column; }
+.topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; box-shadow:var(--shadow-sm); }
+.topbar-title { font-family:'DM Serif Display',serif; font-size:19px; color:var(--text-primary); }
+.topbar-sub { font-size:11px; color:var(--text-muted); margin-top:1px; }
+.status-pill { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+.status-pill.live { background:var(--success-light); color:var(--success); border:1px solid rgba(0,196,140,0.2); }
+.status-dot { width:6px; height:6px; border-radius:50%; background:var(--success); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.8)} }
+.page { padding:24px 28px; }
+.page-section { display:none; }
+.page-section.active { display:block; }
+
+/* ── CARDS & COMPONENTS ── */
+.card { background:var(--surface); border-radius:var(--radius-lg); border:1px solid var(--border); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:16px; }
+.card-header { padding:18px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.card-title { font-size:14px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+.card-title-icon { width:28px; height:28px; background:var(--accent-light); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; }
+.card-body { padding:20px 22px; }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px; }
+.stats-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px; }
+.stat-card { background:var(--surface); border-radius:var(--radius-lg); padding:18px 20px; border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+.stat-icon { width:38px; height:38px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:17px; margin-bottom:12px; }
+.stat-value { font-family:'DM Serif Display',serif; font-size:28px; color:var(--text-primary); letter-spacing:-0.5px; line-height:1; margin-bottom:4px; }
+.stat-label { font-size:11px; color:var(--text-muted); font-weight:500; }
+.two-col { display:grid; grid-template-columns:1fr 360px; gap:16px; }
+.two-col-equal { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.form-group { display:flex; flex-direction:column; gap:5px; }
+.section-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+.btn { padding:11px 20px; border:none; border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
+.btn-primary { background:linear-gradient(135deg,#0070F3,#0056D2); color:#fff; box-shadow:0 4px 14px rgba(0,112,243,0.25); }
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,112,243,0.35); }
+.btn-success { background:linear-gradient(135deg,#00C48C,#00A878); color:#fff; }
+.btn-danger { background:var(--danger-light); color:var(--danger); }
+.btn-sm { padding:6px 14px; font-size:12px; }
+.btn-full { width:100%; justify-content:center; padding:12px; }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+.badge-low { background:var(--success-light); color:var(--success); }
+.badge-medium { background:var(--warning-light); color:var(--warning); }
+.badge-high { background:var(--danger-light); color:var(--danger); }
+.badge-pending { background:#EEF2F7; color:#64748B; }
+.badge-approved { background:var(--success-light); color:var(--success); }
+.badge-declined { background:var(--danger-light); color:var(--danger); }
+table { width:100%; border-collapse:collapse; }
+th { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; padding:10px 16px; text-align:left; background:var(--surface-2); border-bottom:1px solid var(--border); }
+td { padding:13px 16px; font-size:13px; border-bottom:1px solid var(--border); color:var(--text-primary); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--surface-2); }
+.empty { text-align:center; padding:40px; color:var(--text-muted); font-size:13px; }
+.bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.bar-label { font-size:11px; color:var(--text-secondary); width:70px; flex-shrink:0; }
+.bar-track { flex:1; height:8px; background:var(--surface-3); border-radius:20px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:20px; transition:width 1s ease; }
+.bar-val { font-size:11px; font-weight:700; color:var(--text-primary); width:32px; text-align:right; font-family:'JetBrains Mono',monospace; }
+.score-circle { width:120px; height:120px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; transition:all 0.8s ease; }
+.score-circle-value { font-family:'DM Serif Display',serif; font-size:32px; font-weight:700; }
+.result-row { display:flex; justify-content:space-between; align-items:center; padding:9px 12px; background:var(--surface-2); border-radius:8px; border:1px solid var(--border); margin-bottom:8px; }
+.result-label { font-size:11px; color:var(--text-secondary); font-weight:500; }
+.result-value { font-size:12px; font-weight:700; color:var(--text-primary); font-family:'JetBrains Mono',monospace; }
+.rec-box { padding:12px 14px; border-radius:8px; display:flex; align-items:center; gap:10px; margin-top:12px; border:1px solid; }
+.rec-box.approve { background:var(--success-light); border-color:rgba(0,196,140,0.25); color:#047857; }
+.rec-box.conditional { background:var(--warning-light); border-color:rgba(255,176,32,0.25); color:#92400E; }
+.rec-box.decline { background:var(--danger-light); border-color:rgba(255,77,77,0.25); color:#9B1C1C; }
+.threshold-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); }
+.threshold-label { font-size:13px; color:var(--text-secondary); }
+.threshold-input { width:80px; padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; text-align:center; outline:none; }
+.threshold-input:focus { border-color:var(--accent); }
+.toggle { position:relative; width:38px; height:22px; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; inset:0; background:var(--border); border-radius:20px; cursor:pointer; transition:0.2s; }
+.toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.toggle input:checked + .toggle-slider { background:var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(16px); }
+.code-block { background:var(--primary); border-radius:var(--radius-sm); padding:16px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#60A5FA; line-height:2; }
+.plan-card { border:2px solid var(--border); border-radius:var(--radius-lg); padding:24px; text-align:center; transition:all 0.2s; }
+.plan-card:hover { border-color:var(--accent); box-shadow:0 8px 24px rgba(0,112,243,0.1); }
+.plan-card.featured { border-color:var(--accent); background:var(--accent-light); }
+.plan-price { font-family:'DM Serif Display',serif; font-size:32px; color:var(--text-primary); }
+.plan-period { font-size:12px; color:var(--text-muted); }
+.plan-name { font-size:16px; font-weight:700; margin-bottom:8px; }
+.plan-feature { font-size:12px; color:var(--text-secondary); padding:5px 0; border-bottom:1px solid var(--border); }
+.applicant-score-hero { background:linear-gradient(135deg,var(--primary),var(--primary-mid)); border-radius:var(--radius-lg); padding:32px; text-align:center; color:#fff; margin-bottom:16px; position:relative; overflow:hidden; }
+.applicant-score-hero::before { content:''; position:absolute; top:-60px; right:-60px; width:200px; height:200px; background:radial-gradient(circle,rgba(0,112,243,0.3) 0%,transparent 70%); }
+.hero-score-circle { width:140px; height:140px; border-radius:50%; margin:0 auto 16px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:6px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); }
+.hero-score-val { font-family:'DM Serif Display',serif; font-size:42px; color:#fff; line-height:1; }
+.hero-score-label { font-size:10px; color:rgba(255,255,255,0.5); }
+.step-indicator { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:24px; }
+.step { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.step-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
+.step-dot.done { background:var(--success); color:#fff; }
+.step-dot.active { background:var(--accent); color:#fff; }
+.step-dot.pending { background:var(--border); color:var(--text-muted); }
+.step-label { font-size:10px; color:var(--text-muted); }
+.step-line { width:60px; height:2px; background:var(--border); margin-bottom:16px; }
+.step-line.done { background:var(--success); }
+.info-banner { padding:12px 16px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:13px; }
+.info-banner.info { background:var(--accent-light); color:#1e40af; border:1px solid rgba(0,112,243,0.15); }
+.info-banner.success { background:var(--success-light); color:#047857; border:1px solid rgba(0,196,140,0.2); }
+.info-banner.warning { background:var(--warning-light); color:#92400E; border:1px solid rgba(255,176,32,0.2); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { animation:fadeUp 0.4s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  LANDING PAGE                                  -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="landing" class="screen active">
+  <div class="landing-content">
+    <div class="landing-logo">
+      <div class="landing-logo-icon">🧠</div>
+      <div class="landing-logo-text">Credit<span>IQ</span></div>
+    </div>
+    <div class="landing-tagline">🇰🇪 AI-Powered Alternative Credit Scoring — Built for Kenya</div>
+    <div class="landing-title">Financial Inclusion<br>for <em>Every Kenyan</em></div>
+    <div class="landing-sub">Helping SACCOs, MFIs, and digital lenders make smarter, fairer loan decisions using AI and alternative data — no CRB score needed.</div>
+
+    <div class="landing-cards">
+      <div class="portal-card" onclick="showLogin('admin')">
+        <div class="portal-card-icon" style="background:rgba(0,112,243,0.2)">🏦</div>
+        <div class="portal-card-title">Lender Portal</div>
+        <div class="portal-card-sub">For SACCOs, MFIs & financial institutions</div>
+        <div class="portal-card-arrow">→</div>
+      </div>
+      <div class="portal-card" onclick="showLogin('applicant')">
+        <div class="portal-card-icon" style="background:rgba(0,196,140,0.2)">👤</div>
+        <div class="portal-card-title">Applicant Portal</div>
+        <div class="portal-card-sub">For loan applicants & borrowers</div>
+        <div class="portal-card-arrow">→</div>
+      </div>
+    </div>
+
+    <div class="landing-features">
+      <div class="feature-pill">🤖 XGBoost AI Model</div>
+      <div class="feature-pill">📱 M-Pesa Integration</div>
+      <div class="feature-pill">🔒 Secure & Private</div>
+      <div class="feature-pill">⚡ Instant Scoring</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  ADMIN LOGIN                                   -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="admin-login" class="screen">
+  <div class="login-page">
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="login-brand-logo">
+          <div class="login-brand-icon">🏦</div>
+          <div class="login-brand-name">Credit<span>IQ</span></div>
+        </div>
+        <div class="login-brand-desc">The AI credit scoring platform built for Kenyan lenders. Score applicants in seconds using alternative financial data.</div>
+      </div>
+      <div class="login-stats">
+        <div class="login-stat"><div class="login-stat-value">83%+</div><div class="login-stat-label">Model Accuracy</div></div>
+        <div class="login-stat"><div class="login-stat-value">2,400+</div><div class="login-stat-label">Records Trained</div></div>
+        <div class="login-stat"><div class="login-stat-value">&lt;1s</div><div class="login-stat-label">Score Time</div></div>
+        <div class="login-stat"><div class="login-stat-value">100%</div><div class="login-stat-label">No CRB Needed</div></div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="login-box fade-up">
+        <div class="login-role-badge admin">🏦 Lender Portal</div>
+        <div class="login-box-title">Welcome back</div>
+        <div class="login-box-sub">Sign in to your lender dashboard</div>
+        <div class="demo-hint">🔑 Demo credentials: <strong>admin@creditiq.ke</strong> / <strong>admin123</strong></div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" id="adminEmail" type="email" placeholder="admin@creditiq.ke" value="admin@creditiq.ke">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" id="adminPass" type="password" placeholder="••••••••" value="admin123">
+        </div>
+        <button class="login-btn admin" onclick="loginAdmin()">Sign In to Lender Portal →</button>
+        <div class="login-back" onclick="showScreen('landing')">← Back to <span>Home</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  APPLICANT LOGIN                               -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="applicant-login" class="screen">
+  <div class="login-page">
+    <div class="login-left" style="background:linear-gradient(135deg,#065f46,#047857)">
+      <div class="login-brand">
+        <div class="login-brand-logo">
+          <div class="login-brand-icon">👤</div>
+          <div class="login-brand-name">Credit<span style="color:#6EE7B7">IQ</span></div>
+        </div>
+        <div class="login-brand-desc">Apply for a loan and get your AI credit score instantly. No CRB history required — we use your financial behaviour.</div>
+      </div>
+      <div class="login-stats">
+        <div class="login-stat"><div class="login-stat-value">Free</div><div class="login-stat-label">To Apply</div></div>
+        <div class="login-stat"><div class="login-stat-value">Instant</div><div class="login-stat-label">Score Result</div></div>
+        <div class="login-stat"><div class="login-stat-value">Fair</div><div class="login-stat-label">AI Scoring</div></div>
+        <div class="login-stat"><div class="login-stat-value">Safe</div><div class="login-stat-label">Data Privacy</div></div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="login-box fade-up">
+        <div class="login-role-badge applicant">👤 Applicant Portal</div>
+        <div class="login-box-title">Access your score</div>
+        <div class="login-box-sub">Sign in or create an account to apply</div>
+        <div class="demo-hint">🔑 Demo credentials: <strong>john@gmail.com</strong> / <strong>john123</strong></div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" id="appEmail" type="email" placeholder="you@email.com" value="john@gmail.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" id="appPass" type="password" placeholder="••••••••" value="john123">
+        </div>
+        <button class="login-btn applicant" onclick="loginApplicant()">Sign In to Applicant Portal →</button>
+        <div class="login-back" onclick="showScreen('landing')">← Back to <span>Home</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  ADMIN DASHBOARD                               -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="admin-dashboard" class="screen">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-row">
+          <div class="logo-icon">🧠</div>
+          <div class="logo-name">Credit<span>IQ</span></div>
+        </div>
+        <div class="logo-sub">Lender Portal</div>
+      </div>
+      <nav style="padding:14px 12px;flex:1;overflow-y:auto">
+        <div class="nav-section">Main</div>
+        <div class="nav-item active" onclick="adminNav(this,'a-home')"><span class="nav-icon">📊</span>Dashboard</div>
+        <div class="nav-item" onclick="adminNav(this,'a-score')"><span class="nav-icon">⚡</span>Score Applicant</div>
+        <div class="nav-item" onclick="adminNav(this,'a-applicants')"><span class="nav-icon">👥</span>Applicants<span class="nav-badge" id="adminApplicantBadge">0</span></div>
+        <div class="nav-section">Analytics</div>
+        <div class="nav-item" onclick="adminNav(this,'a-analytics')"><span class="nav-icon">📈</span>Analytics</div>
+        <div class="nav-item" onclick="adminNav(this,'a-reports')"><span class="nav-icon">📄</span>Reports</div>
+        <div class="nav-section">Settings</div>
+        <div class="nav-item" onclick="adminNav(this,'a-thresholds')"><span class="nav-icon">🎚️</span>Risk Thresholds</div>
+        <div class="nav-item" onclick="adminNav(this,'a-billing')"><span class="nav-icon">💳</span>Billing</div>
+        <div class="nav-item" onclick="adminNav(this,'a-api')"><span class="nav-icon">🔗</span>API Access</div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-pill">
+          <div class="user-ava admin">AD</div>
+          <div><div class="user-name">Admin User</div><div class="user-role">Lender Admin</div></div>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+      </div>
+    </aside>
+    <main class="main-area">
+      <div class="topbar">
+        <div><div class="topbar-title" id="adminPageTitle">Lender Dashboard</div><div class="topbar-sub" id="adminPageSub">Overview of your credit scoring activity</div></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace" id="adminDate"></div>
+          <div class="status-pill live"><div class="status-dot"></div>API Live</div>
+        </div>
+      </div>
+      <div class="page">
+
+        <!-- HOME -->
+        <div id="a-home" class="page-section active">
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon" style="background:var(--accent-light)">📊</div><div class="stat-value" id="aTotalScored">0</div><div class="stat-label">Total Scored</div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:var(--success-light)">✅</div><div class="stat-value" id="aApproved">0</div><div class="stat-label">Approved</div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:var(--warning-light)">⚠️</div><div class="stat-value" id="aConditional">0</div><div class="stat-label">Conditional</div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:var(--danger-light)">❌</div><div class="stat-value" id="aDeclined">0</div><div class="stat-label">Declined</div></div>
+          </div>
+          <div class="two-col-equal">
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">📊</div>Risk Distribution</div></div>
+              <div class="card-body">
+                <div class="bar-row"><div class="bar-label">Low Risk</div><div class="bar-track"><div class="bar-fill" id="aLowBar" style="background:var(--success)"></div></div><div class="bar-val" id="aLowPct">0%</div></div>
+                <div class="bar-row"><div class="bar-label">Medium</div><div class="bar-track"><div class="bar-fill" id="aMedBar" style="background:var(--warning)"></div></div><div class="bar-val" id="aMedPct">0%</div></div>
+                <div class="bar-row"><div class="bar-label">High Risk</div><div class="bar-track"><div class="bar-fill" id="aHighBar" style="background:var(--danger)"></div></div><div class="bar-val" id="aHighPct">0%</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">💡</div>Portfolio Insights</div></div>
+              <div class="card-body" id="aInsights" style="font-size:13px;color:var(--text-secondary);line-height:1.9">Score applicants to see insights.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">🕐</div>Recent Scores</div>
+              <button class="btn btn-primary btn-sm" onclick="adminNav(document.querySelector('.nav-item:nth-child(3)'),'a-score')">+ New Score</button>
+            </div>
+            <div id="aRecentTable"><div class="empty">No scores yet — start scoring applicants!</div></div>
+          </div>
+        </div>
+
+        <!-- SCORE -->
+        <div id="a-score" class="page-section">
+          <div class="two-col">
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">⚡</div>Score an Applicant</div></div>
+              <div class="card-body">
+                <div class="section-label">Business Information</div>
+                <div class="form-grid">
+                  <div class="form-group"><label class="form-label">Applicant Name</label><input class="form-input" id="sName" placeholder="e.g. John Kamau"></div>
+                  <div class="form-group"><label class="form-label">Owner Age</label><input class="form-input" id="sAge" type="number" placeholder="35"></div>
+                  <div class="form-group"><label class="form-label">Personal Income (KES)</label><input class="form-input" id="sIncome" type="number" placeholder="45000"></div>
+                  <div class="form-group"><label class="form-label">Business Turnover (KES)</label><input class="form-input" id="sTurnover" type="number" placeholder="80000"></div>
+                  <div class="form-group"><label class="form-label">Business Expenses (KES)</label><input class="form-input" id="sExpenses" type="number" placeholder="12000"></div>
+                  <div class="form-group"><label class="form-label">Business Age (Years)</label><input class="form-input" id="sBizAge" type="number" placeholder="5"></div>
+                </div>
+                <div class="section-label">Financial Behaviour</div>
+                <div class="form-grid">
+                  <div class="form-group"><label class="form-label">Has Cellphone</label><select class="form-input" id="sCellphone"><option value="1">Yes</option><option value="0">No</option></select></div>
+                  <div class="form-group"><label class="form-label">Cash Flow Problems</label><select class="form-input" id="sCashflow"><option value="0">No</option><option value="1">Yes</option></select></div>
+                  <div class="form-group"><label class="form-label">Tax Compliance</label><select class="form-input" id="sTax"><option value="1">Compliant</option><option value="0">Non-compliant</option></select></div>
+                  <div class="form-group"><label class="form-label">Offers Credit</label><select class="form-input" id="sCredit"><option value="1">Yes</option><option value="0">No</option></select></div>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="adminScore()" id="adminScoreBtn">⚡ Generate Credit Score</button>
+              </div>
+            </div>
+            <div class="card" style="align-self:start">
+              <div style="padding:18px 22px;background:var(--primary);color:#fff">
+                <div style="font-size:14px;font-weight:700">Credit Score Result</div>
+                <div style="font-size:11px;opacity:0.5;margin-top:2px">AI-powered alternative scoring</div>
+              </div>
+              <div class="card-body">
+                <div id="adminResultEmpty" class="empty" style="padding:30px 0">
+                  <div style="font-size:36px;opacity:0.3;margin-bottom:8px">🎯</div>
+                  Fill in the form and generate a score
+                </div>
+                <div id="adminResultContent" style="display:none">
+                  <div style="text-align:center;margin-bottom:16px">
+                    <div class="score-circle" id="adminScoreCircle" style="border:8px solid var(--success);background:rgba(0,196,140,0.08)">
+                      <div class="score-circle-value" id="adminScoreVal" style="color:var(--success)">0</div>
+                    </div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">out of 100</div>
+                    <div class="badge" id="adminRiskBadge">LOW RISK</div>
+                  </div>
+                  <div id="adminResultRows"></div>
+                  <div class="rec-box approve" id="adminRecBox">
+                    <span style="font-size:18px" id="adminRecIcon">✅</span>
+                    <span style="font-size:13px;font-weight:700" id="adminRecText">Approve loan</span>
+                  </div>
+                  <div style="margin-top:12px;display:flex;gap:8px">
+                    <button class="btn btn-success btn-sm" style="flex:1" onclick="approveFromScore()">✅ Approve</button>
+                    <button class="btn btn-danger btn-sm" style="flex:1" onclick="declineFromScore()">❌ Decline</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APPLICANTS -->
+        <div id="a-applicants" class="page-section">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><div class="card-title-icon">👥</div>All Applicants</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-danger btn-sm" onclick="clearAdminHistory()">🗑️ Clear All</button>
+                <button class="btn btn-primary btn-sm" onclick="exportCSV()">📄 Export CSV</button>
+              </div>
+            </div>
+            <div id="applicantsTable"><div class="empty">No applicants scored yet.</div></div>
+          </div>
+        </div>
+
+        <!-- ANALYTICS -->
+        <div id="a-analytics" class="page-section">
+          <div class="stats-grid-3">
+            <div class="stat-card"><div class="stat-icon" style="background:var(--accent-light)">🏆</div><div class="stat-value" id="anaHigh">—</div><div class="stat-label">Highest Score</div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:var(--success-light)">📈</div><div class="stat-value" id="anaAvg">—</div><div class="stat-label">Average Score</div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:var(--danger-light)">📉</div><div class="stat-value" id="anaLow">—</div><div class="stat-label">Lowest Score</div></div>
+          </div>
+          <div class="two-col-equal">
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">📊</div>Score Ranges</div></div>
+              <div class="card-body">
+                <div class="bar-row"><div class="bar-label">90–100</div><div class="bar-track"><div class="bar-fill" id="ana90bar" style="background:#0070F3"></div></div><div class="bar-val" id="ana90v">0</div></div>
+                <div class="bar-row"><div class="bar-label">75–89</div><div class="bar-track"><div class="bar-fill" id="ana75bar" style="background:#0070F3"></div></div><div class="bar-val" id="ana75v">0</div></div>
+                <div class="bar-row"><div class="bar-label">50–74</div><div class="bar-track"><div class="bar-fill" id="ana50bar" style="background:var(--warning)"></div></div><div class="bar-val" id="ana50v">0</div></div>
+                <div class="bar-row"><div class="bar-label">0–49</div><div class="bar-track"><div class="bar-fill" id="ana0bar" style="background:var(--danger)"></div></div><div class="bar-val" id="ana0v">0</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">💡</div>AI Insights</div></div>
+              <div class="card-body" id="anaInsights" style="font-size:13px;color:var(--text-secondary);line-height:1.9">Score applicants to unlock insights.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="a-reports" class="page-section">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">📄</div>Export Reports</div></div>
+            <div class="card-body">
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">Download your scoring data in various formats for further analysis.</p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="exportCSV()">📊 Download CSV</button>
+                <button class="btn" style="background:var(--surface-2);color:var(--text-primary);border:1px solid var(--border)" onclick="printReport()">🖨️ Print Report</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THRESHOLDS -->
+        <div id="a-thresholds" class="page-section">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">🎚️</div>Risk Scoring Thresholds</div></div>
+            <div class="card-body">
+              <div class="info-banner info">ℹ️ Adjust the minimum score required for each risk tier. Changes apply to all future scores.</div>
+              <div class="threshold-row">
+                <div><div style="font-size:13px;font-weight:600;color:var(--success)">✅ Low Risk (Approve)</div><div style="font-size:11px;color:var(--text-muted)">Minimum score to automatically approve</div></div>
+                <input class="threshold-input" id="thresholdLow" value="75" type="number" min="0" max="100">
+              </div>
+              <div class="threshold-row">
+                <div><div style="font-size:13px;font-weight:600;color:var(--warning)">⚠️ Medium Risk (Conditional)</div><div style="font-size:11px;color:var(--text-muted)">Minimum score for conditional approval</div></div>
+                <input class="threshold-input" id="thresholdMed" value="50" type="number" min="0" max="100">
+              </div>
+              <div class="threshold-row" style="border-bottom:none">
+                <div><div style="font-size:13px;font-weight:600;color:var(--danger)">❌ High Risk (Decline)</div><div style="font-size:11px;color:var(--text-muted)">Scores below medium threshold are declined</div></div>
+                <input class="threshold-input" value="0–49" disabled style="background:var(--surface-2);color:var(--text-muted)">
+              </div>
+              <button class="btn btn-primary" style="margin-top:20px" onclick="saveThresholds()">💾 Save Thresholds</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">⚙️</div>Portal Settings</div></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:0">
+                <div class="threshold-row"><div class="threshold-label">Auto-save all scoring history</div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                <div class="threshold-row"><div class="threshold-label">Email alerts for high-risk scores</div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+                <div class="threshold-row"><div class="threshold-label">Show score explanation (SHAP)</div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                <div class="threshold-row" style="border-bottom:none"><div class="threshold-label">Allow applicant self-scoring</div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BILLING -->
+        <div id="a-billing" class="page-section">
+          <div class="info-banner success">✅ Your current plan: <strong>Business Plan — KES 8,000/month</strong>. Next billing: July 1, 2026.</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+            <div class="plan-card">
+              <div class="plan-name">Starter</div>
+              <div class="plan-price">KES 5–15</div><div class="plan-period">per score call</div>
+              <div style="margin:16px 0">
+                <div class="plan-feature">Pay as you go</div>
+                <div class="plan-feature">Up to 100 scores/month</div>
+                <div class="plan-feature">Basic dashboard</div>
+                <div class="plan-feature">Email support</div>
+              </div>
+              <button class="btn btn-sm" style="width:100%;background:var(--surface-2);border:1px solid var(--border)">Current: Not Selected</button>
+            </div>
+            <div class="plan-card featured">
+              <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⭐ Current Plan</div>
+              <div class="plan-name">Business</div>
+              <div class="plan-price">KES 8,000</div><div class="plan-period">per month</div>
+              <div style="margin:16px 0">
+                <div class="plan-feature">Up to 500 scores/month</div>
+                <div class="plan-feature">Full dashboard + analytics</div>
+                <div class="plan-feature">CSV exports</div>
+                <div class="plan-feature">Priority support</div>
+              </div>
+              <button class="btn btn-primary btn-sm" style="width:100%">✅ Active Plan</button>
+            </div>
+            <div class="plan-card">
+              <div class="plan-name">Enterprise</div>
+              <div class="plan-price">KES 25,000</div><div class="plan-period">per month</div>
+              <div style="margin:16px 0">
+                <div class="plan-feature">Unlimited scores</div>
+                <div class="plan-feature">Custom model training</div>
+                <div class="plan-feature">White-label option</div>
+                <div class="plan-feature">Dedicated support</div>
+              </div>
+              <button class="btn btn-sm" style="width:100%;background:var(--primary);color:#fff">Upgrade</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- API -->
+        <div id="a-api" class="page-section">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">🔗</div>API Endpoints</div></div>
+            <div class="card-body">
+              <div class="code-block">
+                <div><span style="color:#94A3B8">GET  </span> http://127.0.0.1:8000/</div>
+                <div><span style="color:#00C48C">POST </span> http://127.0.0.1:8000/score</div>
+                <div><span style="color:#94A3B8">GET  </span> http://127.0.0.1:8000/health</div>
+                <div><span style="color:#94A3B8">GET  </span> http://127.0.0.1:8000/docs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  APPLICANT DASHBOARD                           -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="applicant-dashboard" class="screen">
+  <div class="app-layout">
+    <aside class="sidebar" style="background:linear-gradient(180deg,#065f46,#047857)">
+      <div class="sidebar-logo">
+        <div class="logo-row">
+          <div class="logo-icon" style="background:linear-gradient(135deg,#00C48C,#00A878)">👤</div>
+          <div class="logo-name">Credit<span style="color:#6EE7B7">IQ</span></div>
+        </div>
+        <div class="logo-sub">Applicant Portal</div>
+      </div>
+      <nav style="padding:14px 12px;flex:1">
+        <div class="nav-section">My Account</div>
+        <div class="nav-item active" onclick="appNav(this,'ap-home')"><span class="nav-icon">🏠</span>My Dashboard</div>
+        <div class="nav-item" onclick="appNav(this,'ap-apply')"><span class="nav-icon">📝</span>Apply for Loan</div>
+        <div class="nav-item" onclick="appNav(this,'ap-score')"><span class="nav-icon">🎯</span>My Score</div>
+        <div class="nav-item" onclick="appNav(this,'ap-status')"><span class="nav-icon">📋</span>Application Status</div>
+        <div class="nav-section">Help</div>
+        <div class="nav-item" onclick="appNav(this,'ap-tips')"><span class="nav-icon">💡</span>Improve My Score</div>
+        <div class="nav-item" onclick="appNav(this,'ap-faq')"><span class="nav-icon">❓</span>FAQs</div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-pill">
+          <div class="user-ava applicant">JK</div>
+          <div><div class="user-name">John Kamau</div><div class="user-role">Loan Applicant</div></div>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+      </div>
+    </aside>
+    <main class="main-area">
+      <div class="topbar">
+        <div><div class="topbar-title" id="appPageTitle">My Dashboard</div><div class="topbar-sub">Track your loan application and credit score</div></div>
+        <div class="status-pill live"><div class="status-dot"></div>Scoring Active</div>
+      </div>
+      <div class="page">
+
+        <!-- HOME -->
+        <div id="ap-home" class="page-section active">
+          <div id="appScoreHero">
+            <div class="applicant-score-hero">
+              <div class="hero-score-circle" id="heroCircle" style="border-color:rgba(255,255,255,0.3)">
+                <div class="hero-score-val" id="heroScore">—</div>
+                <div class="hero-score-label">Credit Score</div>
+              </div>
+              <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#fff;margin-bottom:6px">Welcome, John Kamau!</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:16px">Apply for a loan to get your AI credit score</div>
+              <button class="btn" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2)" onclick="appNav(document.querySelectorAll('#applicant-dashboard .nav-item')[1],'ap-apply')">📝 Apply Now →</button>
+            </div>
+          </div>
+          <div class="stats-grid-3">
+            <div class="stat-card"><div class="stat-icon" style="background:var(--success-light)">🎯</div><div class="stat-value" id="appScoreStat">—</div><div class="stat-label">My Credit Score</div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:var(--accent-light)">📋</div><div class="stat-value" id="appApplications">0</div><div class="stat-label">Applications</div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:var(--warning-light)">⏳</div><div class="stat-value" id="appStatus">None</div><div class="stat-label">Latest Status</div></div>
+          </div>
+          <div class="info-banner info">ℹ️ Your credit score is calculated using AI and your financial behaviour — no CRB history needed!</div>
+        </div>
+
+        <!-- APPLY -->
+        <div id="ap-apply" class="page-section">
+          <div class="step-indicator">
+            <div class="step"><div class="step-dot active">1</div><div class="step-label">Details</div></div>
+            <div class="step-line"></div>
+            <div class="step"><div class="step-dot pending">2</div><div class="step-label">Score</div></div>
+            <div class="step-line"></div>
+            <div class="step"><div class="step-dot pending">3</div><div class="step-label">Result</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">📝</div>Loan Application Form</div></div>
+            <div class="card-body">
+              <div class="section-label">Personal & Business Information</div>
+              <div class="form-grid">
+                <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="apName" placeholder="Your full name" value="John Kamau"></div>
+                <div class="form-group"><label class="form-label">Your Age</label><input class="form-input" id="apAge" type="number" placeholder="35" value="35"></div>
+                <div class="form-group"><label class="form-label">Monthly Income (KES)</label><input class="form-input" id="apIncome" type="number" placeholder="45000" value="45000"></div>
+                <div class="form-group"><label class="form-label">Business Turnover (KES)</label><input class="form-input" id="apTurnover" type="number" placeholder="80000" value="80000"></div>
+                <div class="form-group"><label class="form-label">Monthly Expenses (KES)</label><input class="form-input" id="apExpenses" type="number" placeholder="12000" value="12000"></div>
+                <div class="form-group"><label class="form-label">Years in Business</label><input class="form-input" id="apBizAge" type="number" placeholder="5" value="5"></div>
+              </div>
+              <div class="section-label">Financial Behaviour</div>
+              <div class="form-grid">
+                <div class="form-group"><label class="form-label">Do you own a phone?</label><select class="form-input" id="apCellphone"><option value="1">Yes</option><option value="0">No</option></select></div>
+                <div class="form-group"><label class="form-label">Cash flow problems?</label><select class="form-input" id="apCashflow"><option value="0">No</option><option value="1">Yes</option></select></div>
+                <div class="form-group"><label class="form-label">Do you pay income tax?</label><select class="form-input" id="apTax"><option value="1">Yes</option><option value="0">No</option></select></div>
+                <div class="form-group"><label class="form-label">Do you offer credit to customers?</label><select class="form-input" id="apCredit"><option value="1">Yes</option><option value="0">No</option></select></div>
+              </div>
+              <div class="section-label">Loan Request</div>
+              <div class="form-grid">
+                <div class="form-group"><label class="form-label">Loan Amount (KES)</label><input class="form-input" id="apLoanAmt" type="number" placeholder="100000"></div>
+                <div class="form-group"><label class="form-label">Loan Purpose</label><select class="form-input" id="apLoanPurpose"><option>Business expansion</option><option>Working capital</option><option>Asset purchase</option><option>Emergency</option></select></div>
+              </div>
+              <button class="btn btn-success btn-full" onclick="applicantScore()" id="applyBtn">🎯 Submit & Get My Credit Score</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MY SCORE -->
+        <div id="ap-score" class="page-section">
+          <div id="apScoreEmpty" class="card">
+            <div class="card-body"><div class="empty" style="padding:40px 0"><div style="font-size:40px;opacity:0.3;margin-bottom:10px">🎯</div>No score yet — submit a loan application first!</div></div>
+          </div>
+          <div id="apScoreResult" style="display:none">
+            <div class="applicant-score-hero">
+              <div class="hero-score-circle" id="apHeroCircle" style="border-color:rgba(255,255,255,0.3)">
+                <div class="hero-score-val" id="apHeroScore">0</div>
+                <div class="hero-score-label">out of 100</div>
+              </div>
+              <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#fff;margin-bottom:4px" id="apScoreTitle">Your Credit Score</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.6)" id="apScoreSubtitle">AI-powered alternative data scoring</div>
+            </div>
+            <div class="two-col-equal">
+              <div class="card">
+                <div class="card-header"><div class="card-title"><div class="card-title-icon">📊</div>Score Breakdown</div></div>
+                <div class="card-body" id="apScoreBreakdown"></div>
+              </div>
+              <div class="card">
+                <div class="card-header"><div class="card-title"><div class="card-title-icon">💡</div>What This Means</div></div>
+                <div class="card-body" id="apScoreMeaning" style="font-size:13px;color:var(--text-secondary);line-height:1.8"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATUS -->
+        <div id="ap-status" class="page-section">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">📋</div>Application Status</div></div>
+            <div id="apStatusContent">
+              <div class="empty" style="padding:40px 0">No applications submitted yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIPS -->
+        <div id="ap-tips" class="page-section">
+          <div class="info-banner success">💡 Follow these tips to improve your credit score and increase your chances of loan approval!</div>
+          <div class="two-col-equal">
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">📱</div>Use Mobile Money</div></div>
+              <div class="card-body" style="font-size:13px;color:var(--text-secondary);line-height:1.8">Regularly use M-Pesa for business transactions. Consistent mobile money usage is a strong positive signal in our AI model.</div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">📊</div>Keep Business Records</div></div>
+              <div class="card-body" style="font-size:13px;color:var(--text-secondary);line-height:1.8">Maintain clear records of your income and expenses. Businesses with good records score significantly higher.</div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">💰</div>Pay Taxes on Time</div></div>
+              <div class="card-body" style="font-size:13px;color:var(--text-secondary);line-height:1.8">Tax compliance is one of the strongest indicators of financial responsibility. Compliant businesses score up to 15 points higher.</div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title"><div class="card-title-icon">📈</div>Grow Your Turnover</div></div>
+              <div class="card-body" style="font-size:13px;color:var(--text-secondary);line-height:1.8">Higher business turnover relative to expenses signals a healthy, profitable business. Focus on growing revenue while managing costs.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div id="ap-faq" class="page-section">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><div class="card-title-icon">❓</div>Frequently Asked Questions</div></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:16px;font-size:13px">
+                <div><div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">How is my credit score calculated?</div><div style="color:var(--text-secondary);line-height:1.7">Our AI model uses your business financial data — income, turnover, expenses, mobile money usage, and financial behaviour — to calculate a score from 0 to 100.</div></div>
+                <div style="border-top:1px solid var(--border);padding-top:16px"><div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">Do I need a CRB history?</div><div style="color:var(--text-secondary);line-height:1.7">No! CreditIQ uses alternative data so anyone can get scored, even without a formal credit history.</div></div>
+                <div style="border-top:1px solid var(--border);padding-top:16px"><div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">Is my data safe?</div><div style="color:var(--text-secondary);line-height:1.7">Yes. Your data is encrypted and never shared with third parties without your consent.</div></div>
+                <div style="border-top:1px solid var(--border);padding-top:16px"><div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">How long does scoring take?</div><div style="color:var(--text-secondary);line-height:1.7">Less than 1 second! Our AI model processes your data instantly.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8000';
+let adminHistory = JSON.parse(localStorage.getItem('ciq_admin') || '[]');
+let applicantResult = null;
+
+// ── NAVIGATION ──────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showLogin(role) { showScreen(role === 'admin' ? 'admin-login' : 'applicant-login'); }
+
+function loginAdmin() {
+  const email = document.getElementById('adminEmail').value;
+  const pass = document.getElementById('adminPass').value;
+  if(email === 'admin@creditiq.ke' && pass === 'admin123') {
+    showScreen('admin-dashboard');
+    document.getElementById('adminDate').textContent = new Date().toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    updateAdminDashboard();
+  } else { alert('Invalid credentials. Use: admin@creditiq.ke / admin123'); }
+}
+
+function loginApplicant() {
+  const email = document.getElementById('appEmail').value;
+  const pass = document.getElementById('appPass').value;
+  if(email === 'john@gmail.com' && pass === 'john123') {
+    showScreen('applicant-dashboard');
+    updateApplicantHome();
+  } else { alert('Invalid credentials. Use: john@gmail.com / john123'); }
+}
+
+function logout() { showScreen('landing'); }
+
+function adminNav(el, sectionId) {
+  document.querySelectorAll('#admin-dashboard .nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#admin-dashboard .page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  const titles = {'a-home':['Lender Dashboard','Overview'],'a-score':['Score Applicant','AI credit scoring'],'a-applicants':['All Applicants','Manage scored applicants'],'a-analytics':['Analytics','Portfolio insights'],'a-reports':['Reports','Export data'],'a-thresholds':['Risk Thresholds','Configure scoring rules'],'a-billing':['Billing','Manage subscription'],'a-api':['API Access','Endpoints']};
+  if(titles[sectionId]) { document.getElementById('adminPageTitle').textContent = titles[sectionId][0]; document.getElementById('adminPageSub').textContent = titles[sectionId][1]; }
+  if(sectionId==='a-applicants') renderApplicantsTable();
+  if(sectionId==='a-analytics') renderAnalytics();
+}
+
+function appNav(el, sectionId) {
+  document.querySelectorAll('#applicant-dashboard .nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#applicant-dashboard .page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  const titles = {'ap-home':'My Dashboard','ap-apply':'Apply for Loan','ap-score':'My Credit Score','ap-status':'Application Status','ap-tips':'Improve My Score','ap-faq':'FAQs'};
+  document.getElementById('appPageTitle').textContent = titles[sectionId] || sectionId;
+}
+
+// ── ADMIN SCORING ───────────────────────────────
+async function adminScore() {
+  const btn = document.getElementById('adminScoreBtn');
+  btn.textContent = '⏳ Scoring...'; btn.disabled = true;
+  try {
+    const res = await fetch(`${API}/score`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        owner_age: parseFloat(document.getElementById('sAge').value)||0,
+        personal_income: parseFloat(document.getElementById('sIncome').value)||0,
+        business_expenses: parseFloat(document.getElementById('sExpenses').value)||0,
+        business_turnover: parseFloat(document.getElementById('sTurnover').value)||0,
+        business_age_years: parseFloat(document.getElementById('sBizAge').value)||0,
+        has_cellphone: parseInt(document.getElementById('sCellphone').value),
+        current_problem_cash_flow: parseInt(document.getElementById('sCashflow').value),
+        compliance_income_tax: parseInt(document.getElementById('sTax').value),
+        offers_credit_to_customers: parseInt(document.getElementById('sCredit').value),
+        motor_vehicle_insurance: 0
+      })
+    });
+    const data = await res.json();
+    const entry = { name: document.getElementById('sName').value||'Unknown', score: data.credit_score, risk: data.risk_tier, rec: data.recommendation, mobile: data.has_mobile_money_prediction, time: new Date().toISOString(), status: 'pending' };
+    adminHistory.unshift(entry);
+    localStorage.setItem('ciq_admin', JSON.stringify(adminHistory));
+    showAdminResult(entry);
+    updateAdminDashboard();
+  } catch { alert('API Error! Make sure FastAPI is running on port 8000.'); }
+  btn.textContent = '⚡ Generate Credit Score'; btn.disabled = false;
+}
+
+function showAdminResult(entry) {
+  document.getElementById('adminResultEmpty').style.display = 'none';
+  document.getElementById('adminResultContent').style.display = 'block';
+  const s = entry.score;
+  const color = s>=75?'var(--success)':s>=50?'var(--warning)':'var(--danger)';
+  const circle = document.getElementById('adminScoreCircle');
+  circle.style.borderColor = color; circle.style.background = s>=75?'rgba(0,196,140,0.08)':s>=50?'rgba(255,176,32,0.08)':'rgba(255,77,77,0.08)';
+  document.getElementById('adminScoreVal').textContent = s; document.getElementById('adminScoreVal').style.color = color;
+  const badge = document.getElementById('adminRiskBadge');
+  badge.textContent = entry.risk; badge.className = 'badge ' + (s>=75?'badge-low':s>=50?'badge-medium':'badge-high');
+  document.getElementById('adminResultRows').innerHTML = [['Applicant',entry.name],['Score',`${s} / 100`],['Risk Tier',entry.risk],['Mobile Money',entry.mobile?'✅ Yes':'❌ No'],['Scored At',new Date(entry.time).toLocaleTimeString('en-KE')]].map(([k,v])=>`<div class="result-row"><span class="result-label">${k}</span><span class="result-value">${v}</span></div>`).join('');
+  const box = document.getElementById('adminRecBox');
+  box.className = 'rec-box '+(s>=75?'approve':s>=50?'conditional':'decline');
+  document.getElementById('adminRecIcon').textContent = s>=75?'✅':s>=50?'⚠️':'❌';
+  document.getElementById('adminRecText').textContent = entry.rec;
+}
+
+function approveFromScore() {
+  if(adminHistory.length>0){ adminHistory[0].status='approved'; localStorage.setItem('ciq_admin',JSON.stringify(adminHistory)); alert('✅ Applicant Approved!'); updateAdminDashboard(); }
+}
+
+function declineFromScore() {
+  if(adminHistory.length>0){ adminHistory[0].status='declined'; localStorage.setItem('ciq_admin',JSON.stringify(adminHistory)); alert('❌ Applicant Declined.'); updateAdminDashboard(); }
+}
+
+// ── APPLICANT SCORING ───────────────────────────
+async function applicantScore() {
+  const btn = document.getElementById('applyBtn');
+  btn.textContent = '⏳ Submitting...'; btn.disabled = true;
+  try {
+    const res = await fetch(`${API}/score`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        owner_age: parseFloat(document.getElementById('apAge').value)||0,
+        personal_income: parseFloat(document.getElementById('apIncome').value)||0,
+        business_expenses: parseFloat(document.getElementById('apExpenses').value)||0,
+        business_turnover: parseFloat(document.getElementById('apTurnover').value)||0,
+        business_age_years: parseFloat(document.getElementById('apBizAge').value)||0,
+        has_cellphone: parseInt(document.getElementById('apCellphone').value),
+        current_problem_cash_flow: parseInt(document.getElementById('apCashflow').value),
+        compliance_income_tax: parseInt(document.getElementById('apTax').value),
+        offers_credit_to_customers: parseInt(document.getElementById('apCredit').value),
+        motor_vehicle_insurance: 0
+      })
+    });
+    const data = await res.json();
+    applicantResult = { name: document.getElementById('apName').value||'Applicant', score: data.credit_score, risk: data.risk_tier, rec: data.recommendation, mobile: data.has_mobile_money_prediction, loanAmt: document.getElementById('apLoanAmt').value, loanPurpose: document.getElementById('apLoanPurpose').value, time: new Date().toISOString() };
+    showApplicantScore(applicantResult);
+    updateApplicantHome();
+    appNav(document.querySelectorAll('#applicant-dashboard .nav-item')[2], 'ap-score');
+  } catch { alert('API Error! Make sure FastAPI is running on port 8000.'); }
+  btn.textContent = '🎯 Submit & Get My Credit Score'; btn.disabled = false;
+}
+
+function showApplicantScore(r) {
+  document.getElementById('apScoreEmpty').style.display = 'none';
+  document.getElementById('apScoreResult').style.display = 'block';
+  const s = r.score;
+  const color = s>=75?'#00C48C':s>=50?'#FFB020':'#FF4D4D';
+  const circle = document.getElementById('apHeroCircle');
+  circle.style.borderColor = color;
+  document.getElementById('apHeroScore').textContent = s;
+  document.getElementById('apScoreTitle').textContent = s>=75?'Excellent Score! 🎉':s>=50?'Good Score ✅':'Keep Improving 💪';
+  document.getElementById('apScoreSubtitle').textContent = r.risk + ' — ' + r.rec;
+  document.getElementById('apScoreBreakdown').innerHTML = [['Your Score',`${s} / 100`],['Risk Level',r.risk],['Recommendation',r.rec],['Mobile Money',r.mobile?'✅ Yes':'❌ No'],['Loan Request',r.loanAmt?`KES ${Number(r.loanAmt).toLocaleString()}`:'—'],['Purpose',r.loanPurpose||'—'],['Scored At',new Date(r.time).toLocaleTimeString('en-KE')]].map(([k,v])=>`<div class="result-row"><span class="result-label">${k}</span><span class="result-value">${v}</span></div>`).join('');
+  document.getElementById('apScoreMeaning').innerHTML = s>=75?`<p>🎉 <strong>Congratulations!</strong> Your score of <strong>${s}/100</strong> puts you in the <strong>Low Risk</strong> tier.</p><br><p>✅ You are likely to be <strong>approved</strong> for your loan request.</p><br><p>📈 Keep maintaining good financial habits to keep this score!</p>`:s>=50?`<p>✅ Your score of <strong>${s}/100</strong> is in the <strong>Medium Risk</strong> tier.</p><br><p>⚠️ You may be approved <strong>with conditions</strong> such as a guarantor or reduced loan amount.</p><br><p>💡 See our tips to improve your score!</p>`:`<p>💪 Your score of <strong>${s}/100</strong> needs improvement.</p><br><p>❌ Your application may be declined at this stage.</p><br><p>💡 Follow our score improvement tips to increase your chances next time.</p>`;
+  renderApplicantStatus(r);
+}
+
+function updateApplicantHome() {
+  if(applicantResult) {
+    const s = applicantResult.score;
+    const color = s>=75?'#00C48C':s>=50?'#FFB020':'#FF4D4D';
+    document.getElementById('heroScore').textContent = s;
+    document.getElementById('heroCircle').style.borderColor = color;
+    document.getElementById('appScoreStat').textContent = s;
+    document.getElementById('appApplications').textContent = '1';
+    document.getElementById('appStatus').textContent = s>=75?'Likely Approved':s>=50?'Conditional':'Declined';
+  }
+}
+
+function renderApplicantStatus(r) {
+  const s = r.score;
+  const statusClass = s>=75?'badge-approved':s>=50?'badge-pending':'badge-declined';
+  const statusText = s>=75?'Likely Approved':s>=50?'Under Review':'Declined';
+  document.getElementById('apStatusContent').innerHTML = `
+    <table>
+      <thead><tr><th>Application ID</th><th>Loan Amount</th><th>Purpose</th><th>Score</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>APP-${Date.now().toString().slice(-6)}</strong></td>
+          <td>KES ${r.loanAmt?Number(r.loanAmt).toLocaleString():'—'}</td>
+          <td>${r.loanPurpose||'—'}</td>
+          <td style="font-family:monospace;font-weight:700;color:${s>=75?'var(--success)':s>=50?'var(--warning)':'var(--danger)'}">${s}</td>
+          <td><span class="badge ${statusClass}">${statusText}</span></td>
+          <td style="font-size:11px;color:var(--text-muted);font-family:monospace">${new Date(r.time).toLocaleString('en-KE')}</td>
+        </tr>
+      </tbody>
+    </table>`;
+}
+
+// ── ADMIN DASHBOARD UPDATE ──────────────────────
+function updateAdminDashboard() {
+  const total = adminHistory.length;
+  const approved = adminHistory.filter(s=>s.score>=75).length;
+  const conditional = adminHistory.filter(s=>s.score>=50&&s.score<75).length;
+  const declined = adminHistory.filter(s=>s.score<50).length;
+  document.getElementById('aTotalScored').textContent = total;
+  document.getElementById('aApproved').textContent = approved;
+  document.getElementById('aConditional').textContent = conditional;
+  document.getElementById('aDeclined').textContent = declined;
+  document.getElementById('adminApplicantBadge').textContent = total;
+  const pct = v => total>0?Math.round((v/total)*100):0;
+  const setBar = (b,p,v) => { document.getElementById(b).style.width=v+'%'; document.getElementById(p).textContent=v+'%'; };
+  setBar('aLowBar','aLowPct',pct(approved));
+  setBar('aMedBar','aMedPct',pct(conditional));
+  setBar('aHighBar','aHighPct',pct(declined));
+  const insights = document.getElementById('aInsights');
+  if(total===0) { insights.textContent='Score applicants to see insights.'; }
+  else {
+    const avg = (adminHistory.reduce((a,b)=>a+b.score,0)/total).toFixed(1);
+    insights.innerHTML = `<p>📊 <strong>${pct(approved)}%</strong> approval rate</p><p>📈 Average score: <strong>${avg}/100</strong></p><p>🏆 Best: <strong>${Math.max(...adminHistory.map(s=>s.score))}/100</strong></p><p>📉 Lowest: <strong>${Math.min(...adminHistory.map(s=>s.score))}/100</strong></p><p style="margin-top:8px;color:${avg>=75?'var(--success)':avg>=50?'var(--warning)':'var(--danger)'}">${avg>=75?'✅ Healthy portfolio':avg>=50?'⚠️ Monitor closely':'❌ High risk portfolio'}</p>`;
+  }
+  // Recent table
+  const recentDiv = document.getElementById('aRecentTable');
+  if(total===0) { recentDiv.innerHTML='<div class="empty">No scores yet.</div>'; return; }
+  recentDiv.innerHTML = `<table><thead><tr><th>Applicant</th><th>Score</th><th>Risk</th><th>Recommendation</th><th>Status</th><th>Time</th></tr></thead><tbody>${adminHistory.slice(0,8).map(s=>`<tr><td><strong>${s.name}</strong></td><td style="font-family:monospace;font-weight:700;color:${s.score>=75?'var(--success)':s.score>=50?'var(--warning)':'var(--danger)'}">${s.score}</td><td><span class="badge ${s.score>=75?'badge-low':s.score>=50?'badge-medium':'badge-high'}">${s.risk}</span></td><td style="color:var(--text-secondary)">${s.rec}</td><td><span class="badge ${s.status==='approved'?'badge-approved':s.status==='declined'?'badge-declined':'badge-pending'}">${s.status||'Pending'}</span></td><td style="font-size:11px;color:var(--text-muted);font-family:monospace">${new Date(s.time).toLocaleTimeString('en-KE')}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function renderApplicantsTable() {
+  const div = document.getElementById('applicantsTable');
+  if(adminHistory.length===0){div.innerHTML='<div class="empty">No applicants scored yet.</div>';return;}
+  div.innerHTML=`<table><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Risk</th><th>Recommendation</th><th>Status</th><th>Actions</th><th>Date</th></tr></thead><tbody>${adminHistory.map((s,i)=>`<tr><td style="color:var(--text-muted)">${adminHistory.length-i}</td><td><strong>${s.name}</strong></td><td style="font-family:monospace;font-weight:700;color:${s.score>=75?'var(--success)':s.score>=50?'var(--warning)':'var(--danger)'}">${s.score}</td><td><span class="badge ${s.score>=75?'badge-low':s.score>=50?'badge-medium':'badge-high'}">${s.risk}</span></td><td style="color:var(--text-secondary)">${s.rec}</td><td><span class="badge ${s.status==='approved'?'badge-approved':s.status==='declined'?'badge-declined':'badge-pending'}">${s.status||'Pending'}</span></td><td style="display:flex;gap:4px"><button class="btn btn-sm" style="background:var(--success-light);color:var(--success);padding:4px 10px" onclick="setStatus(${i},'approved')">✅</button><button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger);padding:4px 10px" onclick="setStatus(${i},'declined')">❌</button></td><td style="font-size:11px;color:var(--text-muted);font-family:monospace">${new Date(s.time).toLocaleString('en-KE')}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function setStatus(i,status){adminHistory[i].status=status;localStorage.setItem('ciq_admin',JSON.stringify(adminHistory));renderApplicantsTable();updateAdminDashboard();}
+
+function renderAnalytics() {
+  const h = adminHistory;
+  if(h.length===0){document.getElementById('anaInsights').textContent='Score applicants to unlock insights.';return;}
+  const scores = h.map(s=>s.score);
+  document.getElementById('anaHigh').textContent=Math.max(...scores);
+  document.getElementById('anaAvg').textContent=(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
+  document.getElementById('anaLow').textContent=Math.min(...scores);
+  const total=h.length,r90=h.filter(s=>s.score>=90).length,r75=h.filter(s=>s.score>=75&&s.score<90).length,r50=h.filter(s=>s.score>=50&&s.score<75).length,r0=h.filter(s=>s.score<50).length;
+  const max=Math.max(r90,r75,r50,r0,1);
+  document.getElementById('ana90bar').style.width=(r90/max*100)+'%';document.getElementById('ana90v').textContent=r90;
+  document.getElementById('ana75bar').style.width=(r75/max*100)+'%';document.getElementById('ana75v').textContent=r75;
+  document.getElementById('ana50bar').style.width=(r50/max*100)+'%';document.getElementById('ana50v').textContent=r50;
+  document.getElementById('ana0bar').style.width=(r0/max*100)+'%';document.getElementById('ana0v').textContent=r0;
+  const avg=(scores.reduce((a,b)=>a+b,0)/total).toFixed(1);
+  const pct=v=>Math.round((v/total)*100);
+  document.getElementById('anaInsights').innerHTML=`<p>📊 Total applicants: <strong>${total}</strong></p><p>✅ Approval rate: <strong>${pct(h.filter(s=>s.score>=75).length)}%</strong></p><p>📈 Average score: <strong>${avg}/100</strong></p><p>🏆 Top scorer: <strong>${Math.max(...scores)}/100</strong></p><p style="margin-top:8px">Model accuracy: <strong>83%+</strong></p>`;
+}
+
+function clearAdminHistory(){if(confirm('Clear all applicant history?')){adminHistory=[];localStorage.removeItem('ciq_admin');renderApplicantsTable();updateAdminDashboard();}}
+
+function exportCSV(){
+  if(adminHistory.length===0){alert('No data to export.');return;}
+  const csv=[['Name','Score','Risk','Recommendation','Status','Date'],...adminHistory.map(s=>[s.name,s.score,s.risk,s.rec,s.status||'Pending',new Date(s.time).toLocaleString('en-KE')])].map(r=>r.join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:'creditiq_report.csv'});a.click();
+}
+
+function saveThresholds(){alert(`✅ Thresholds saved!\nLow Risk: ${document.getElementById('thresholdLow').value}+\nMedium Risk: ${document.getElementById('thresholdMed').value}+`);}
+
+function printReport(){window.print();}
+</script>
+</body>
+</html>
